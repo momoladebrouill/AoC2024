@@ -72,8 +72,43 @@ def day3():
             line = line[4:-2]
             e = [int(e) for e in line.split(',')]
             s += e[0] * e[1] * mul
-
     return s
+def ppos(w,h):
+    for x in range(w):
+        for y in range(h):
+            yield x,y
+
+def add(pos,direc):
+    return pos[0] + direc[0], pos[1] + direc[1]
+
+def day4(i):
+    word = "XMAS"
+    grid = []
+    for l in i.split("\n"):
+        grid.append(l)
+    w = len(grid[0])
+    h = len(grid)
+
+    def get(cpos):
+        x,y = cpos
+        if 0<=x<w and 0<=y<h:
+            return grid[y][x]
+        return '.'
+    dirs = [(-1,-1),(0,-1),(1,-1),
+            (-1,0), (1,0),
+            (-1,1),(0,1),(1,1)]
+    c = 0
+
+
+    for x,y in ppos(w,h):
+        cpos = x,y
+        good = False
+        if get(cpos) == 'A':
+            diag1 = set((get(add(cpos,(-1,-1))),get(add(cpos,(1,1)))))
+            diag2 = set((get(add(cpos,(-1,1))),get(add(cpos,(1,-1)))))
+            good = diag2 == diag1 == set(('M','S'))
+        c += good
+
 
 def solve(d,i):
     if d == 1:
@@ -82,6 +117,8 @@ def solve(d,i):
         return day2(i)
     elif d == 3:
         return day3(i)
+    elif d == 4:
+        return day4(i)
     else:
         return "Unknown day"
 
