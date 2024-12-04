@@ -41,7 +41,8 @@ def is_safe(l):
     return safe
 
 def day2(i):
-    s = 0
+    s1 = 0
+    s2 = 0
     for l in i.split("\n"):
         l = l.split(" ")
         if not l:
@@ -50,6 +51,7 @@ def day2(i):
         safer = False
         if is_safe(l):
             safer = True
+        s1 += safer
         else:
             for i in range(len(l)):
                 lp = l.copy()
@@ -57,12 +59,13 @@ def day2(i):
                 if is_safe(lp):
                     safer = True
                     break
-        s += int(safer)
-    return (0,s)
+        s2 += int(safer)
+    return (s1,s2)
 def day3():
     # cat input.txt | grep -oE "(do\(\)|don't\(\)|mul\([1-9][0-9]?[0-9]?,[1-9][0-9]?[0-9]?\))" > input2.txt
     mul = 1
-    s=0
+    s1 = 0
+    s2 = 0
     for line in f:
         if line == "do()\n":
             mul = 1
@@ -71,8 +74,9 @@ def day3():
         else:
             line = line[4:-2]
             e = [int(e) for e in line.split(',')]
-            s += e[0] * e[1] * mul
-    return s
+            s1 += e[0] * e[1]
+            s2 += e[0] * e[1] * mul
+    return s1,s2
 def ppos(w,h):
     for x in range(w):
         for y in range(h):
@@ -85,7 +89,8 @@ def day4(i):
     word = "XMAS"
     grid = []
     for l in i.split("\n"):
-        grid.append(l)
+        if l:
+            grid.append(l)
     w = len(grid[0])
     h = len(grid)
 
@@ -97,8 +102,9 @@ def day4(i):
     dirs = [(-1,-1),(0,-1),(1,-1),
             (-1,0), (1,0),
             (-1,1),(0,1),(1,1)]
-    c = 0
 
+    c1 = 0
+    c2 = 0
 
     for x,y in ppos(w,h):
         cpos = x,y
@@ -106,8 +112,17 @@ def day4(i):
         if get(cpos) == 'A':
             diag1 = set((get(add(cpos,(-1,-1))),get(add(cpos,(1,1)))))
             diag2 = set((get(add(cpos,(-1,1))),get(add(cpos,(1,-1)))))
-            good = diag2 == diag1 == set(('M','S'))
-        c += good
+            c2 += diag2 == diag1 == set(('M','S'))
+        for direc in dirs:
+            cpos = x,y
+            good1 = True
+            for char in word:
+                if char != get(cpos):
+                    good1 = False
+                    break
+                cpos = add(cpos,direc)
+            c1 += good1
+    return c1,c2
 
 
 def solve(d,i):
@@ -121,5 +136,9 @@ def solve(d,i):
         return day4(i)
     else:
         return "Unknown day"
+
+if __name__ == "__main__":
+    f = open("../../aoctmp/input.txt")
+    print(solve(4,f.read()))
 
 
