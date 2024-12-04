@@ -59,10 +59,30 @@ def day2(i):
                     break
         s += int(safer)
     return (0,s)
+def day3():
+    # cat input.txt | grep -oE "(do\(\)|don't\(\)|mul\([1-9][0-9]?[0-9]?,[1-9][0-9]?[0-9]?\))" > input2.txt
+    mul = 1
+    s=0
+    for line in f:
+        if line == "do()\n":
+            mul = 1
+        elif line == "don't()\n":
+            mul = 0
+        else:
+            line = line[4:-2]
+            e = [int(e) for e in line.split(',')]
+            s += e[0] * e[1] * mul
+
+    return s
 
 def solve(d,i):
     if d == 1:
         return day1(i)
     elif d == 2:
         return day2(i)
+    elif d == 3:
+        return day3(i)
+    else:
+        return "Unknown day"
+
 
