@@ -29,8 +29,36 @@ def day1(i):
         s2 += left*occ(left,dl)
     return (s1,s2)
 
+def is_safe(l):
+    safe = True
+    sign = l[0] - l[1]
+    for i in range(len(l)-1):
+        if l[i] == l[i+1] \
+                or abs(l[i] - l[i+1]) > 3 \
+                or (l[i] - l[i+1])*sign <= 0:
+            safe = False
+            break
+    return safe
+
 def day2(i):
-    return (1,1)
+    s = 0
+    for l in i.split("\n"):
+        l = l.split(" ")
+        if not l:
+            pass
+        l = [int(e) for e in l]
+        safer = False
+        if is_safe(l):
+            safer = True
+        else:
+            for i in range(len(l)):
+                lp = l.copy()
+                lp.pop(i)
+                if is_safe(lp):
+                    safer = True
+                    break
+        s += int(safer)
+    return (0,s)
 
 def solve(d,i):
     if d == 1:
