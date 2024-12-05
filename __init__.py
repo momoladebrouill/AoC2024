@@ -52,7 +52,7 @@ def day2(i):
         if is_safe(l):
             safer = True
         s1 += safer
-        else:
+        if not safer:
             for i in range(len(l)):
                 lp = l.copy()
                 lp.pop(i)
@@ -61,6 +61,7 @@ def day2(i):
                     break
         s2 += int(safer)
     return (s1,s2)
+
 def day3():
     # cat input.txt | grep -oE "(do\(\)|don't\(\)|mul\([1-9][0-9]?[0-9]?,[1-9][0-9]?[0-9]?\))" > input2.txt
     mul = 1
@@ -77,12 +78,15 @@ def day3():
             s1 += e[0] * e[1]
             s2 += e[0] * e[1] * mul
     return s1,s2
+
 def ppos(w,h):
+    """ itérateur sur les positions de la grille """
     for x in range(w):
         for y in range(h):
             yield x,y
 
 def add(pos,direc):
+    """ ajoute direc à pos (vecteurs) """
     return pos[0] + direc[0], pos[1] + direc[1]
 
 def day4(i):
@@ -166,8 +170,6 @@ def day5(i):
             s2 += int(middle(update))
 
     return s1,s2
-
-
 
 def solve(d,i):
     if d == 1:
