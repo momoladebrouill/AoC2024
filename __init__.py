@@ -124,6 +124,50 @@ def day4(i):
             c1 += good1
     return c1,c2
 
+def day5(i):
+    s1 = 0
+    s2 = 0
+
+    rules,lists = i.split("\n\n")
+
+    updates = lists.split("\n")
+    updates = [e.split(',') for e in updates if e]
+
+    rules = rules.split("\n")
+    rules = [r.split("|") for r in rules]
+    islessthan = {}
+
+    for a,b in rules:
+        if a in islessthan:
+            islessthan[a].append(b)
+        else:
+            islessthan[a] = [b]
+
+    def compare(a,b):
+        if a in islessthan[b] :
+            return -1
+        return 1
+
+    def isordered(l):
+        for i in range(len(l)):
+            for j in range(i+1,len(l)):
+                if compare(l[i],l[j]) == -1:
+                    return False
+        return True
+
+    def middle(l):
+        return l[int(len(l)/2)]
+
+    for update in updates:
+        if isordered(update):
+            s1 += int(middle(update))
+        else:
+            update = sorted(update,key=cmp_to_key(compare))
+            s2 += int(middle(update))
+
+    return s1,s2
+
+
 
 def solve(d,i):
     if d == 1:
@@ -134,11 +178,8 @@ def solve(d,i):
         return day3(i)
     elif d == 4:
         return day4(i)
+    elif d == 5:
+        return day5(i)
     else:
         return "Unknown day"
-
-if __name__ == "__main__":
-    f = open("../../aoctmp/input.txt")
-    print(solve(4,f.read()))
-
 
