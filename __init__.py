@@ -171,6 +171,73 @@ def day5(i):
 
     return s1,s2
 
+def day6(i):
+    s = 0
+    t = []
+    f = i.split('\n')
+    for line in f:
+        if line:
+            t.append(list(line))
+    w = len(t[0])
+    h = len(t)
+
+    def get(cpos):
+        x,y = cpos
+        if 0<=x<w and 0<=y<h:
+            return t[y][x]
+        return 'F'
+
+    def tset(cpos,v):
+        x,y = cpos
+        t[y][x] = v
+
+    initpos = (0,0)
+    for cpos in ppos(w,h):
+        if get(cpos) == '^':
+            initpos = cpos
+    direcs = [(0,-1),(1,0),(0,1),(-1,0)]
+
+    # Part 1
+    positions = set()
+    l = 0
+    i = 0
+    loop = False
+    pos = initpos
+    while get(pos) != 'F':
+        positions.add(pos)
+        npos = add(pos,direcs[i])
+        if get(npos) == '#':
+            i = (i+1) % 4
+        else:
+            pos = npos
+    s1 = len(positions)
+
+    # Part 2
+    s2 = 0
+    for change in ppos(w,h):
+        if get(change) == '#':
+            continue
+        tset(change,'#')
+        # redémarrer le parcours dans cette nouvelle map
+        positions = set()
+        i = 0
+        loop = False
+        pos = initpos
+        while get(pos) != 'F' and not loop:
+            npos = add(pos,direcs[i])
+            if get(npos) == '#':
+                i = (i+1) % 4
+            else:
+                pos = npos
+            if (pos,i) in positions:
+                loop = True
+            else:
+                positions.add((pos,i))
+        s2 += loop
+        tset(change,'.')
+    return s1,s2
+
+
 def solve(d,i):
     if d == 1:
         return day1(i)
@@ -182,6 +249,8 @@ def solve(d,i):
         return day4(i)
     elif d == 5:
         return day5(i)
+    elif d == 6:
+        return day6(i)
     else:
         return "Unknown day"
 
