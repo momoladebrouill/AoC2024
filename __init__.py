@@ -236,6 +236,112 @@ def day6(i):
         s2 += loop
         tset(change,'.')
     return s1,s2
+def day9(i):
+    s = 0
+    carte = []
+    file = True
+    ID = 0
+    paquets_vides = []
+    paquets_pleins = []
+    class Data:
+        def __init__(self,ID,qqty):
+            self.ID = ID
+            self.qqty = qqty
+        def __repr__(self):
+            return "ID : "+self.ID+" QQTY : "+str(self.qqty)
+    class Vide:
+        def __init__(self,q,prec):
+            self.qqty = q
+            self.prec = prec
+        def __repr__(self):
+            return 'vide :'+str(self.qqty)
+
+    for c in i[:-1]:
+        qqty = int(c)
+        if file:
+            e = Data(str(ID),qqty)
+            carte.append(e)
+            paquets_pleins.append(e)
+            ID += 1
+        else:
+            e = Vide(qqty,str(ID))
+            carte.append(e)
+            paquets_vides.append(e)
+        file = not file
+    print(carte)
+    paquets_pleins.reverse()
+    def remplissage():
+        current_vide = paquets_vides[0]
+        current_data = paquets_pleins[0]
+        while current_vide.prec != current_data.ID:
+            # q : la quantité transférée
+            if current_vide.qqty >= current_data.qqty:
+                # si on a plus de place, on met tout
+                q = current_data.qqty
+            else:
+                # sinon, on bourre ce qu'il reste
+                q = current_vide.qqty
+            if q:
+                current_vide.qqty -= q
+                current_data.qqty -= q
+                yield Data(current_data.ID,q)
+            if current_vide.qqty == 0:
+                paquets_vides.pop(0)
+                if paquets_vides:
+                    current_vide = paquets_vides[0]
+                yield 'Nouveau Pas'
+            if current_data.qqty == 0:
+                paquets_pleins.pop(0)
+                if paquets_pleins:
+                    current_data = paquets_pleins[0]
+
+        if current_vide.qqty >= current_data.qqty:
+            # si on a plus de place, on met tout
+            q = current_data.qqty
+        else:
+            # sinon, on bourre ce qu'il reste
+            q = current_vide.qqty
+        if q:
+            current_vide.qqty -= q
+            current_data.qqty -= q
+            yield Data(current_data.ID,q)
+        yield 'Nouveau Pas'
+        
+
+    rempli = remplissage()
+    flag = True
+    newmap = []
+    for elem in carte:
+        if type(elem) == type(Data("r",1)) and elem.qqty:
+            newmap.append(elem)
+        else:
+            try:
+                e = next(rempli)
+            except StopIteration:
+                flag = False
+            while e!="Nouveau Pas" and flag:
+                newmap.append(e)
+                try:
+                    e = next(rempli)
+                except StopIteration:
+                    flag = False
+        if not flag:
+            break
+    print(newmap)
+    total = sum(e.qqty for e in newmap)
+    i = 0
+    itr = iter(newmap)
+    c = next(itr)
+    while i < total:
+        s += int(c.ID) * i
+        i += 1
+        c.qqty -= 1
+        if c.qqty == 0:
+            try:
+                c = next(itr)
+            except StopIteration:
+                break
+    return s
 
 
 def solve(d,i):
