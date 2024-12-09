@@ -236,6 +236,7 @@ def day6(i):
         s2 += loop
         tset(change,'.')
     return s1,s2
+
 def day9(i):
     s = 0
     carte = []
@@ -255,92 +256,50 @@ def day9(i):
             self.prec = prec
         def __repr__(self):
             return 'vide :'+str(self.qqty)
+    def repres(carte):
+        for elem in carte:
+            if type(elem) == Vide:
+                print("."*elem.qqty,end="")
+            else:
+                print(elem.ID*elem.qqty,end="")
+        print()
 
-    for c in i[:-1]:
-        qqty = int(c)
+    for c in i:
+        if c != '\n':
+            qqty = int(c)
         if file:
             e = Data(str(ID),qqty)
             carte.append(e)
             paquets_pleins.append(e)
             ID += 1
-        else:
+        elif qqty!=0:
             e = Vide(qqty,str(ID))
             carte.append(e)
             paquets_vides.append(e)
         file = not file
+
     print(carte)
+    repres(carte)
     paquets_pleins.reverse()
-    def remplissage():
-        current_vide = paquets_vides[0]
-        current_data = paquets_pleins[0]
-        while current_vide.prec != current_data.ID:
-            # q : la quantité transférée
-            if current_vide.qqty >= current_data.qqty:
-                # si on a plus de place, on met tout
-                q = current_data.qqty
-            else:
-                # sinon, on bourre ce qu'il reste
-                q = current_vide.qqty
-            if q:
-                current_vide.qqty -= q
-                current_data.qqty -= q
-                yield Data(current_data.ID,q)
-            if current_vide.qqty == 0:
-                paquets_vides.pop(0)
-                if paquets_vides:
-                    current_vide = paquets_vides[0]
-                yield 'Nouveau Pas'
-            if current_data.qqty == 0:
-                paquets_pleins.pop(0)
-                if paquets_pleins:
-                    current_data = paquets_pleins[0]
-
-        if current_vide.qqty >= current_data.qqty:
-            # si on a plus de place, on met tout
-            q = current_data.qqty
-        else:
-            # sinon, on bourre ce qu'il reste
-            q = current_vide.qqty
-        if q:
-            current_vide.qqty -= q
-            current_data.qqty -= q
-            yield Data(current_data.ID,q)
-        yield 'Nouveau Pas'
-        
-
-    rempli = remplissage()
-    flag = True
-    newmap = []
-    for elem in carte:
-        if type(elem) == type(Data("r",1)) and elem.qqty:
-            newmap.append(elem)
-        else:
-            try:
-                e = next(rempli)
-            except StopIteration:
-                flag = False
-            while e!="Nouveau Pas" and flag:
-                newmap.append(e)
-                try:
-                    e = next(rempli)
-                except StopIteration:
-                    flag = False
-        if not flag:
-            break
-    print(newmap)
-    total = sum(e.qqty for e in newmap)
-    i = 0
-    itr = iter(newmap)
-    c = next(itr)
-    while i < total:
-        s += int(c.ID) * i
-        i += 1
-        c.qqty -= 1
-        if c.qqty == 0:
-            try:
-                c = next(itr)
-            except StopIteration:
+    for elem in paquets_pleins:
+        for i in range(len(carte)):
+            if carte[i] == elem:
                 break
+            if type(carte[i]) == Vide and carte[i].qqty >= elem.qqty:
+                carte[i].qqty -= elem.qqty
+                carte.insert(i,Data(elem.ID,elem.qqty))
+                elem.ID = str(0)
+                break
+    print(carte)
+    mul = 0
+    for elem in carte:
+        if type(elem) == Vide:
+            mul += elem.qqty
+        else:
+            for i in range(elem.qqty):
+                s += mul*int(elem.ID)
+                mul += 1
+
     return s
 
 
@@ -357,6 +316,8 @@ def solve(d,i):
         return day5(i)
     elif d == 6:
         return day6(i)
+    elif d == 9:
+        return day9(i)
     else:
         return "Unknown day"
 
