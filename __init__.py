@@ -302,6 +302,51 @@ def day9(i):
 
     return s
 
+def day10(i):
+    s1 = 0
+    s2 = 0
+    t = []
+    for line in i.split('\n'):
+        if line:
+            t.append(line)
+    w = len(t[0])
+    h = len(t)
+
+    def get(t,pos):
+        x,y = pos
+        if 0<=x<w and 0<=y<h:
+            return t[y][x]
+        else:
+            return "-1"
+
+    def around(pos):
+        neigh = [(-1,0),(1,0),(0,-1),(0,1)]
+        for n in neigh:
+            yield add(pos,n)
+
+    def reacheable(pos,ind):
+        """ renvoie la liste des chemins atteignant un 9 """
+        if ind == 9:
+            return [[pos]]
+        else:
+            paths = []
+            for pos in around(pos):
+                if int(get(t,pos)) == ind+1:
+                    l = reacheable(pos,ind+1)
+                    for elem in l:
+                        elem.append(pos)
+                    paths += l
+            return paths
+
+    for pos in ppos(w,h):
+        if get(t,pos) == '0':
+            r = reacheable(pos,0)
+            s1 += len(set([e[0] for e in r]))
+            s2 += len(r)
+
+    return s1,s2
+
+
 
 def solve(d,i):
     if d == 1:
@@ -318,6 +363,8 @@ def solve(d,i):
         return day6(i)
     elif d == 9:
         return day9(i)
+    elif d == 10:
+        return day10(i)
     else:
         return "Unknown day"
 
