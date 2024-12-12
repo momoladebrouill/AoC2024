@@ -343,8 +343,96 @@ def day10(i):
             r = reacheable(pos,0)
             s1 += len(set([e[0] for e in r]))
             s2 += len(r)
-
     return s1,s2
+
+def get(t,d,bord,pos):
+    w,h = bord
+    x,y = pos
+    if 0<=x<w and 0<=y<h:
+        return t[y][x]
+    return d
+
+def setpos(t,bord,pos,v):
+    w,h = bord
+    x,y = pos
+    if 0<=x<w and 0<=y<h:
+        t[y][x] = v
+    
+
+def add(pos,direc):
+    return pos[0] + direc[0], pos[1] + direc[1]
+
+def aroundd(pos):
+    neigh = [((-1,0),'g'),((1,0),'d'),((0,-1),'h'),((0,1),'b')]
+    for n,ori in neigh:
+        yield add(pos,n),ori
+
+
+def day12(f):
+    s1 = 0
+    s2 = 0
+    t = []
+    flag = [] # visitied
+    for line in f.split('\n'):
+        if line:
+            t.append(line)
+            flag.append([False for _ in line])
+    w = len(t[0])
+    h = len(t)
+    gett = lambda pos : get(t,'.',(w,h),pos)
+    getf = lambda pos : get(flag,False,(w,h),pos)
+    setf = lambda pos,value : setpos(flag,(w,h),pos,value)
+    regions = set()
+    def explore(pos,typ,visited,ori):
+        if gett(pos) != typ:
+            return set(),[(ori,pos)]
+        else:
+            region = set([pos])
+            perimeter = []
+            setf(pos,True)
+            visited.add(pos)
+            for npos,ori in aroundd(pos):
+                if npos not in visited:
+                    nregion,nperi = explore(npos,typ,visited,ori)
+                    region = region.union(nregion)
+                    perimeter += nperi
+            return region,perimeter
+    def different(positions,close):
+        suggestions = []
+        for pos in positions:
+            found = False
+            for sugg in suggestions:
+                if any(close(pos,sugg_pos) for sugg_pos in sugg):
+                    sugg.append(pos)
+                    found = True
+            if found == False:
+                suggestions.append([pos])
+        return len(suggestions)
+
+
+    for pos in ppos(w,h):
+        if getf(pos):
+            continue
+        typ = gett(pos)
+        region, borders = explore(pos,typ,set(),'')
+        bspec = {'h':[],'g':[],'b':[],'d':[]}
+        for ori,pos in borders: 
+            bspec[ori].append(pos)
+        nfaces = 0
+        for key in bspec:
+            if key in 'gd':
+                # si c'est un truc au dessus ou au dessous
+                bspec[key].sort(key = lambda pos:pos[1])
+                close = lambda pos,sugg : sugg == add(pos,(0,-1)) or sugg == add(pos,(0,1))
+            else:
+                # si c'est un truc à gauche ou à droite
+                bspec[key].sort(key = lambda pos:pos[0])
+                close = lambda pos,sugg : sugg == add(pos,(-1,0)) or sugg == add(pos,(1,0))
+            nfaces += different(bspec[key],close)
+        s1 += len(region) * len(border)
+        s2 += len(region) * nfaces
+    return s1,s2
+
 
 
 
@@ -365,6 +453,8 @@ def solve(d,i):
         return day9(i)
     elif d == 10:
         return day10(i)
+    elif d == 12:
+        return day12(i)
     else:
         return "Unknown day"
 
